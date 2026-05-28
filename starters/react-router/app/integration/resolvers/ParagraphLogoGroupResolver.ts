@@ -1,6 +1,5 @@
-import type { FragmentOf } from "gql.tada";
+import type { FragmentOf, ResultOf } from "gql.tada";
 import { readFragment } from "gql.tada";
-import { LogoGroup } from "~/components/blocks";
 import { MediaImageFragment } from "~/graphql/fragments/media";
 import { LinkFragment } from "~/graphql/fragments/misc";
 import { graphql } from "~/graphql/gql.tada";
@@ -8,10 +7,6 @@ import {
   resolveLink,
   resolveMediaImage,
 } from "~/integration/resolvers/helpers";
-
-interface ParagraphLogoGroupProps {
-  paragraph: FragmentOf<typeof ParagraphLogoGroupFragment>;
-}
 
 export const ParagraphLogoFragment = graphql(
   `
@@ -43,20 +38,15 @@ export const ParagraphLogoGroupFragment = graphql(
   [ParagraphLogoFragment],
 );
 
-export const ParagraphLogoGroupResolver = ({
+export const paragraphLogoGroupResolver = ({
   paragraph,
-}: ParagraphLogoGroupProps) => {
-  const { id, heading, items } = readFragment(
-    ParagraphLogoGroupFragment,
-    paragraph,
-  );
+}: {
+  paragraph: ResultOf<typeof ParagraphLogoGroupFragment>;
+}) => {
+  const { id, heading, items } = paragraph;
   const logos = items
     ? items.map((item) => {
-        const {
-          id,
-          link: linkFragment,
-          image,
-        } = readFragment(
+        const { id, link: linkFragment, image } = readFragment(
           ParagraphLogoFragment,
           item as FragmentOf<typeof ParagraphLogoFragment>,
         );
@@ -65,7 +55,7 @@ export const ParagraphLogoGroupResolver = ({
         return {
           id,
           image: {
-            ...resolveMediaImage(image),
+            ...(resolveMediaImage(image) ?? {}),
             className: "h-12",
           },
           link,
@@ -73,6 +63,9 @@ export const ParagraphLogoGroupResolver = ({
       })
     : [];
 
-  // @ts-expect-error - fix typings.
-  return <LogoGroup id={id} heading={heading} logos={logos} />;
+  return {
+    id,
+    heading,
+    logos,
+  };
 };

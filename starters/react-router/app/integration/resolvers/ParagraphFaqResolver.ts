@@ -1,12 +1,6 @@
-import type { FragmentOf } from "gql.tada";
+import type { FragmentOf, ResultOf } from "gql.tada";
 import { readFragment } from "gql.tada";
-
-import { FAQ } from "~/components/blocks";
 import { graphql } from "~/graphql/gql.tada";
-
-interface ParagraphFaqProps {
-  paragraph: FragmentOf<typeof ParagraphFaqFragment>;
-}
 
 const ParagraphQuestionFragment = graphql(`
   fragment ParagraphQuestionFragment on ParagraphQuestion {
@@ -35,11 +29,12 @@ export const ParagraphFaqFragment = graphql(
   [ParagraphQuestionFragment],
 );
 
-export const ParagraphFaqResolver = ({ paragraph }: ParagraphFaqProps) => {
-  const { id, heading, descriptionOptional, items } = readFragment(
-    ParagraphFaqFragment,
-    paragraph,
-  );
+export const paragraphFaqResolver = ({
+  paragraph,
+}: {
+  paragraph: ResultOf<typeof ParagraphFaqFragment>;
+}) => {
+  const { id, heading, descriptionOptional, items } = paragraph;
   const questions = items.map((item) => {
     const { question, answer } = readFragment(
       ParagraphQuestionFragment,
@@ -52,13 +47,10 @@ export const ParagraphFaqResolver = ({ paragraph }: ParagraphFaqProps) => {
     };
   });
 
-  return (
-    <FAQ
-      id={id}
-      key={id}
-      heading={heading}
-      description={descriptionOptional || ""}
-      questions={questions}
-    />
-  );
+  return {
+    id,
+    heading,
+    description: descriptionOptional || "",
+    questions,
+  };
 };

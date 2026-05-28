@@ -5,31 +5,28 @@ import { ImageFragment, MediaImageFragment } from "~/graphql/fragments/media";
 import { LinkFragment } from "~/graphql/fragments/misc";
 import { UserFragment } from "~/graphql/fragments/user";
 
-// @todo: Import types from privitives
-type UserProps = {
+interface UserProps {
   name: string;
   avatar: {
     src?: string;
     name: string;
   };
-};
+}
+
+export function isNonNull<T>(value: T): value is NonNullable<T> {
+  return value !== null && value !== undefined;
+}
 
 export const resolveMediaImage = (
-  media: FragmentOf<typeof MediaImageFragment>,
-): ImageProps => {
-  if (!media) {
-    return {} as ImageProps;
-  }
+  media: FragmentOf<typeof MediaImageFragment> | null | undefined,
+): ImageProps | null => {
+  if (!media) return null;
 
   const { mediaImage } = readFragment(MediaImageFragment, media);
-  if (!mediaImage) {
-    return {} as ImageProps;
-  }
+  if (!mediaImage) return null;
 
   const image = readFragment(ImageFragment, mediaImage);
-  if (!image) {
-    return {} as ImageProps;
-  }
+  if (!image) return null;
 
   return {
     alt: image.alt || "",
@@ -41,32 +38,23 @@ export const resolveMediaImage = (
 
 export const resolveLink = (
   link: FragmentOf<typeof LinkFragment>,
-): ButtonProps => {
+): ButtonProps | null => {
   const { title: text, url: href, internal } = readFragment(LinkFragment, link);
 
-  if (!text || !href) {
-    return {} as ButtonProps;
-  }
+  if (!text || !href) return null;
 
-  return {
-    text,
-    href,
-    internal,
-  };
+  return { text, href, internal };
 };
 
 export const resolveUser = (
-  user: FragmentOf<typeof UserFragment>,
+  user: FragmentOf<typeof UserFragment> | null | undefined,
 ): UserProps => {
-  if (!user) {
-    return {} as UserProps;
-  }
+  if (!user) return { name: "", avatar: { name: "" } };
 
   const { name, picture } = readFragment(UserFragment, user);
 
-  if (!picture) {
-    return { name, avatar: {} } as UserProps;
-  }
-
-  return { name, avatar: resolveMediaImage(picture) } as UserProps;
+  return {
+    name,
+    avatar: { src: resolveMediaImage(picture)?.src, name },
+  };
 };
