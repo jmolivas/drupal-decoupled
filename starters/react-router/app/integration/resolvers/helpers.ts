@@ -1,17 +1,14 @@
-import type { FragmentOf } from "gql.tada";
+import type { FragmentOf, ResultOf } from "gql.tada";
 import { readFragment } from "gql.tada";
-import type { ButtonProps, ImageProps } from "~/components/primitives";
+import type { AvatarProps, ButtonProps, ImageProps } from "~/components/primitives";
 import { ImageFragment, MediaImageFragment } from "~/graphql/fragments/media";
 import { LinkFragment } from "~/graphql/fragments/misc";
 import { UserFragment } from "~/graphql/fragments/user";
 
-interface UserProps {
-  name: string;
-  avatar: {
-    src?: string;
-    name: string;
-  };
-}
+type UserProps = {
+  name: ResultOf<typeof UserFragment>["name"];
+  avatar: AvatarProps;
+};
 
 export function isNonNull<T>(value: T): value is NonNullable<T> {
   return value !== null && value !== undefined;

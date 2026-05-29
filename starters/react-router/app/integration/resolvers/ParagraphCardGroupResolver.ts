@@ -1,4 +1,4 @@
-import type { FragmentOf, ResultOf } from "gql.tada";
+import type { ResultOf } from "gql.tada";
 import { readFragment } from "gql.tada";
 import { MediaImageFragment } from "~/graphql/fragments/media";
 import { graphql } from "~/graphql/gql.tada";
@@ -36,6 +36,11 @@ export const ParagraphCardGroupFragment = graphql(
   [ParagraphSimpleCardFragment],
 );
 
+type CardItem = Extract<
+  NonNullable<ResultOf<typeof ParagraphCardGroupFragment>["items"]>[number],
+  { __typename: "ParagraphSimpleCard" }
+>;
+
 export const paragraphCardGroupResolver = ({
   paragraph,
 }: {
@@ -48,7 +53,7 @@ export const paragraphCardGroupResolver = ({
         const type = "simple" as const;
         const { heading, description, image } = readFragment(
           ParagraphSimpleCardFragment,
-          item as FragmentOf<typeof ParagraphSimpleCardFragment>,
+          item as CardItem,
         );
 
         return {

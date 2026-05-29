@@ -1,4 +1,4 @@
-import type { FragmentOf, ResultOf } from "gql.tada";
+import type { ResultOf } from "gql.tada";
 import { readFragment } from "gql.tada";
 import { MediaImageFragment } from "~/graphql/fragments/media";
 import { LinkFragment } from "~/graphql/fragments/misc";
@@ -38,6 +38,11 @@ export const ParagraphLogoGroupFragment = graphql(
   [ParagraphLogoFragment],
 );
 
+type LogoItem = Extract<
+  NonNullable<ResultOf<typeof ParagraphLogoGroupFragment>["items"]>[number],
+  { __typename: "ParagraphLogo" }
+>;
+
 export const paragraphLogoGroupResolver = ({
   paragraph,
 }: {
@@ -48,7 +53,7 @@ export const paragraphLogoGroupResolver = ({
     ? items.map((item) => {
         const { id, link: linkFragment, image } = readFragment(
           ParagraphLogoFragment,
-          item as FragmentOf<typeof ParagraphLogoFragment>,
+          item as LogoItem,
         );
         const link = linkFragment ? resolveLink(linkFragment) : null;
 

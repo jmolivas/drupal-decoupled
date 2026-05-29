@@ -1,4 +1,4 @@
-import type { FragmentOf, ResultOf } from "gql.tada";
+import type { ResultOf } from "gql.tada";
 import { readFragment } from "gql.tada";
 import { graphql } from "~/graphql/gql.tada";
 
@@ -29,6 +29,11 @@ export const ParagraphFaqFragment = graphql(
   [ParagraphQuestionFragment],
 );
 
+type QuestionItem = Extract<
+  NonNullable<ResultOf<typeof ParagraphFaqFragment>["items"]>[number],
+  { __typename: "ParagraphQuestion" }
+>;
+
 export const paragraphFaqResolver = ({
   paragraph,
 }: {
@@ -38,7 +43,7 @@ export const paragraphFaqResolver = ({
   const questions = items.map((item) => {
     const { question, answer } = readFragment(
       ParagraphQuestionFragment,
-      item as FragmentOf<typeof ParagraphQuestionFragment>,
+      item as QuestionItem,
     );
 
     return {

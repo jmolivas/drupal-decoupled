@@ -1,84 +1,104 @@
 import type { ReactNode } from "react";
-import type { ResultOf } from "gql.tada";
+import { readFragment } from "gql.tada";
 import type { Spec } from "@json-render/core";
 
 import { JSONUIProvider, Renderer } from "@json-render/react";
-import type { ParagraphUnionFragment } from "~/graphql/fragments/paragraph";
-import type { NodeResultOf } from "~/graphql/types";
+import { ParagraphUnionFragment } from "~/graphql/fragments/paragraph";
+import type { NodeResultOf, ParagraphResultOf } from "~/graphql/types";
 import { nodeArticleResolver } from "~/integration/resolvers/NodeArticleResolver";
 import {
-  type ParagraphCardGroupFragment,
+  ParagraphCardGroupFragment,
   paragraphCardGroupResolver,
 } from "~/integration/resolvers/ParagraphCardGroupResolver";
 import {
-  type ParagraphCtaFragment,
+  ParagraphCtaFragment,
   paragraphCtaResolver,
 } from "~/integration/resolvers/ParagraphCtaResolver";
 import {
-  type ParagraphFaqFragment,
+  ParagraphFaqFragment,
   paragraphFaqResolver,
 } from "~/integration/resolvers/ParagraphFaqResolver";
 import {
-  type ParagraphHeroFragment,
+  ParagraphHeroFragment,
   paragraphHeroResolver,
 } from "~/integration/resolvers/ParagraphHeroResolver";
 import {
-  type ParagraphLogoGroupFragment,
+  ParagraphLogoGroupFragment,
   paragraphLogoGroupResolver,
 } from "~/integration/resolvers/ParagraphLogoGroupResolver";
 import {
-  type ParagraphTestimonialFragment,
+  ParagraphTestimonialFragment,
   paragraphTestimonialResolver,
 } from "~/integration/resolvers/ParagraphTestimonialResolver";
 import {
-  type ParagraphViewReferenceFragment,
+  ParagraphViewReferenceFragment,
   paragraphViewReferenceResolver,
 } from "~/integration/resolvers/ParagraphViewReferenceResolver";
 import {
-  type ParagraphWebformFragment,
+  ParagraphWebformFragment,
   paragraphWebformResolver,
 } from "~/integration/resolvers/ParagraphWebformResolver";
 import { registry } from "~/integration/resolvers/registry";
 
 const resolverMap: Record<
   string,
-  (item: ResultOf<typeof ParagraphUnionFragment>) => Record<string, unknown>
+  (item: ParagraphResultOf) => Record<string, unknown>
 > = {
   ParagraphHero: (item) =>
     paragraphHeroResolver({
-      paragraph: item as unknown as ResultOf<typeof ParagraphHeroFragment>,
+      paragraph: readFragment(
+        ParagraphHeroFragment,
+        item as Extract<ParagraphResultOf, { __typename: "ParagraphHero" }>,
+      ),
     }),
   ParagraphCardGroup: (item) =>
     paragraphCardGroupResolver({
-      paragraph: item as unknown as ResultOf<typeof ParagraphCardGroupFragment>,
+      paragraph: readFragment(
+        ParagraphCardGroupFragment,
+        item as Extract<ParagraphResultOf, { __typename: "ParagraphCardGroup" }>,
+      ),
     }),
   ParagraphCta: (item) =>
     paragraphCtaResolver({
-      paragraph: item as unknown as ResultOf<typeof ParagraphCtaFragment>,
+      paragraph: readFragment(
+        ParagraphCtaFragment,
+        item as Extract<ParagraphResultOf, { __typename: "ParagraphCta" }>,
+      ),
     }),
   ParagraphFaq: (item) =>
     paragraphFaqResolver({
-      paragraph: item as unknown as ResultOf<typeof ParagraphFaqFragment>,
+      paragraph: readFragment(
+        ParagraphFaqFragment,
+        item as Extract<ParagraphResultOf, { __typename: "ParagraphFaq" }>,
+      ),
     }),
   ParagraphLogoGroup: (item) =>
     paragraphLogoGroupResolver({
-      paragraph: item as unknown as ResultOf<typeof ParagraphLogoGroupFragment>,
+      paragraph: readFragment(
+        ParagraphLogoGroupFragment,
+        item as Extract<ParagraphResultOf, { __typename: "ParagraphLogoGroup" }>,
+      ),
     }),
   ParagraphTestimonial: (item) =>
     paragraphTestimonialResolver({
-      paragraph: item as unknown as ResultOf<
-        typeof ParagraphTestimonialFragment
-      >,
+      paragraph: readFragment(
+        ParagraphTestimonialFragment,
+        item as Extract<ParagraphResultOf, { __typename: "ParagraphTestimonial" }>,
+      ),
     }),
   ParagraphViewReference: (item) =>
     paragraphViewReferenceResolver({
-      paragraph: item as unknown as ResultOf<
-        typeof ParagraphViewReferenceFragment
-      >,
+      paragraph: readFragment(
+        ParagraphViewReferenceFragment,
+        item as Extract<ParagraphResultOf, { __typename: "ParagraphViewReference" }>,
+      ),
     }),
   ParagraphWebform: (item) =>
     paragraphWebformResolver({
-      paragraph: item as unknown as ResultOf<typeof ParagraphWebformFragment>,
+      paragraph: readFragment(
+        ParagraphWebformFragment,
+        item as Extract<ParagraphResultOf, { __typename: "ParagraphWebform" }>,
+      ),
     }),
 };
 
@@ -133,9 +153,7 @@ export function resolve({ header, footer, entity }: ResolveProps): Spec {
       };
     }
     for (const component of entity.components ?? []) {
-      const item = component as unknown as ResultOf<
-        typeof ParagraphUnionFragment
-      >;
+      const item = readFragment(ParagraphUnionFragment, component);
       rootChildren.push(item.id);
       const resolver = resolverMap[item.__typename];
       if (resolver) {

@@ -1,4 +1,4 @@
-import type { FragmentOf, ResultOf } from "gql.tada";
+import type { ResultOf } from "gql.tada";
 import { readFragment } from "gql.tada";
 import { MediaImageFragment } from "~/graphql/fragments/media";
 import { graphql } from "~/graphql/gql.tada";
@@ -35,6 +35,11 @@ export const ParagraphTestimonialFragment = graphql(
   [ParagraphAuthorFragment],
 );
 
+type AuthorField = Extract<
+  NonNullable<ResultOf<typeof ParagraphTestimonialFragment>["author"]>,
+  { __typename: "ParagraphAuthor" }
+>;
+
 export const paragraphTestimonialResolver = ({
   paragraph,
 }: {
@@ -47,7 +52,7 @@ export const paragraphTestimonialResolver = ({
   } = paragraph;
   const { name, position, company, image: imageFragment } = readFragment(
     ParagraphAuthorFragment,
-    authorFragment as FragmentOf<typeof ParagraphAuthorFragment>,
+    authorFragment as AuthorField,
   );
   return {
     id,
