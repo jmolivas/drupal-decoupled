@@ -7,7 +7,7 @@ import {
   ViewBlogTeaserResultFragment,
 } from "~/graphql/fragments/view";
 import { graphql } from "~/graphql/gql.tada";
-import { resolveMediaImage } from "~/integration/resolvers/helpers";
+import { resolveLink, resolveMediaImage } from "~/integration/resolvers/helpers";
 
 type ReferenceFragment = NonNullable<
   ResultOf<typeof ParagraphViewReferenceFragment>["reference"]
@@ -71,7 +71,7 @@ export const paragraphViewReferenceResolver = ({
   } = paragraph;
 
   const action = linkFragment
-    ? readFragment(LinkFragment, linkFragment)
+    ? resolveLink(linkFragment) ?? undefined
     : undefined;
   const reference = calculateReference(referenceFragment as ReferenceFragment);
   const { view, display, results } = reference
@@ -85,7 +85,7 @@ export const paragraphViewReferenceResolver = ({
         item as FragmentOf<typeof NodeArticleTeaserFragment>,
       );
       const details = {
-        href: path,
+        href: path ?? "",
         text: "Read post",
         internal: true,
       };
@@ -115,3 +115,5 @@ export const paragraphViewReferenceResolver = ({
     action,
   };
 };
+
+export type ViewReferenceData = ReturnType<typeof paragraphViewReferenceResolver>;

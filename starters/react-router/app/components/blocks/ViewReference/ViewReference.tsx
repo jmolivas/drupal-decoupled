@@ -1,36 +1,10 @@
 import { CardGroup, Hero } from "~/components/blocks";
-import type { ImageProps } from "~/components/primitives";
+import type { ViewReferenceData } from "~/integration/resolvers/ParagraphViewReferenceResolver";
 
-interface CardDetails {
-  href: string | null;
-  text: string;
-  internal: boolean;
-}
+type Card = ViewReferenceData["cards"][number];
+type Action = ViewReferenceData["action"];
 
-interface Card {
-  heading: string;
-  summary?: string | null;
-  type: string;
-  details: CardDetails;
-  image?: ImageProps;
-}
-
-interface Action {
-  url?: string | null;
-  title?: string | null;
-  internal?: boolean | null;
-}
-
-export interface ViewReferenceProps {
-  id: string;
-  view?: string | null;
-  display?: string | null;
-  cards: Card[];
-  headingOptional?: string | null;
-  subheadingOptional?: string | null;
-  descriptionOptional?: string | null;
-  action?: Action;
-}
+export type ViewReferenceProps = ViewReferenceData;
 
 export const ViewReference = ({
   id,
@@ -54,8 +28,8 @@ export const ViewReference = ({
           description={featured.summary ?? ""}
           actions={[
             {
-              href: featured.details.href || "",
-              text: featured.details.text || "",
+              href: featured.details.href,
+              text: featured.details.text,
               internal: true,
             },
           ]}
@@ -66,10 +40,8 @@ export const ViewReference = ({
             heading={headingOptional || ""}
             subheading={subheadingOptional || ""}
             description={descriptionOptional || ""}
-            // @ts-expect-error - fix typings.
-            cards={remainingCards}
-            // @ts-expect-error - fix typings.
-            action={action}
+            cards={remainingCards as Card[]}
+            action={action as Action}
           />
         )}
       </div>
@@ -84,10 +56,8 @@ export const ViewReference = ({
         heading={headingOptional || ""}
         subheading={subheadingOptional || ""}
         description={descriptionOptional || ""}
-        // @ts-expect-error - fix typings.
-        cards={cards}
-        // @ts-expect-error - fix typings.
-        action={action}
+        cards={cards as Card[]}
+        action={action as Action}
       />
     );
   }
