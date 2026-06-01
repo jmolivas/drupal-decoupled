@@ -62,14 +62,14 @@ const teaserCardSchema = z.object({
   tags: z.array(z.string()).optional(),
 });
 
-// Intentionally differs from teaserCardSchema: href and summary are nullable
-// because Drupal view results may omit them, unlike hand-authored card groups.
+// Intentionally differs from teaserCardSchema: summary is nullable
+// because Drupal view results may omit it, unlike hand-authored card groups.
 const viewReferenceCardSchema = z.object({
   heading: z.string(),
   summary: z.string().optional().nullable(),
   type: z.string(),
   details: z.object({
-    href: z.string().nullable(),
+    href: z.string(),
     text: z.string(),
     internal: z.boolean(),
   }),
@@ -77,9 +77,9 @@ const viewReferenceCardSchema = z.object({
 });
 
 const viewReferenceActionSchema = z.object({
-  url: z.string().optional().nullable(),
-  title: z.string().optional().nullable(),
-  internal: z.boolean().optional().nullable(),
+  href: z.string(),
+  text: z.string(),
+  internal: z.boolean().optional(),
 });
 
 export const catalog = defineCatalog(schema, {
@@ -231,8 +231,8 @@ export const catalog = defineCatalog(schema, {
     ParagraphViewReference: {
       props: z.object({
         id: z.string(),
-        view: z.string().optional().nullable(),
-        display: z.string().optional().nullable(),
+        view: z.string().optional(),
+        display: z.string().optional(),
         cards: z.array(viewReferenceCardSchema),
         headingOptional: z.string().optional().nullable(),
         subheadingOptional: z.string().optional().nullable(),

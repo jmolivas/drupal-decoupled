@@ -1,10 +1,26 @@
 import { CardGroup, Hero } from "~/components/blocks";
+import type { CardGroupProps } from "~/components/blocks/CardGroup/CardGroup";
+import type { ImageProps } from "~/components/primitives";
 import type { ViewReferenceData } from "~/integration/resolvers/ParagraphViewReferenceResolver";
 
-type Card = ViewReferenceData["cards"][number];
-type Action = ViewReferenceData["action"];
+type ViewReferenceCard = {
+  heading: string;
+  summary?: string | null;
+  type: string;
+  details: { href: string; text: string; internal: boolean };
+  image?: ImageProps;
+};
 
-export type ViewReferenceProps = ViewReferenceData;
+export interface ViewReferenceProps {
+  id: string;
+  view?: string;
+  display?: string;
+  cards: ViewReferenceCard[];
+  headingOptional?: string | null;
+  subheadingOptional?: string | null;
+  descriptionOptional?: string | null;
+  action?: ViewReferenceData["action"];
+}
 
 export const ViewReference = ({
   id,
@@ -40,8 +56,8 @@ export const ViewReference = ({
             heading={headingOptional || ""}
             subheading={subheadingOptional || ""}
             description={descriptionOptional || ""}
-            cards={remainingCards as Card[]}
-            action={action as Action}
+            cards={remainingCards as CardGroupProps["cards"]}
+            action={action as CardGroupProps["action"]}
           />
         )}
       </div>
@@ -56,8 +72,8 @@ export const ViewReference = ({
         heading={headingOptional || ""}
         subheading={subheadingOptional || ""}
         description={descriptionOptional || ""}
-        cards={cards as Card[]}
-        action={action as Action}
+        cards={cards as CardGroupProps["cards"]}
+        action={action as CardGroupProps["action"]}
       />
     );
   }

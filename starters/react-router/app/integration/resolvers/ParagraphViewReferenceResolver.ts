@@ -74,9 +74,9 @@ export const paragraphViewReferenceResolver = ({
     ? resolveLink(linkFragment) ?? undefined
     : undefined;
   const reference = calculateReference(referenceFragment as ReferenceFragment);
-  const { view, display, results } = reference
-    ? reference
-    : { view: undefined, display: undefined, results: undefined };
+  const view = (reference?.view ?? undefined) as string | undefined;
+  const display = (reference?.display ?? undefined) as string | undefined;
+  const results = reference?.results;
   const cards = results
     ? results.map((item) => {
       const type = "teaser";
