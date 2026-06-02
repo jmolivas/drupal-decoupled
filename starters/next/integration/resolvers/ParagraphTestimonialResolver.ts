@@ -1,12 +1,8 @@
-import { type FragmentOf, readFragment } from "gql.tada";
-import { Testimonial } from "@/components/blocks";
+import type { ResultOf } from "gql.tada";
+import { readFragment } from "gql.tada";
 import { MediaImageFragment } from "@/graphql/fragments/media";
 import { graphql } from "@/graphql/gql.tada";
 import { resolveMediaImage } from "@/integration/resolvers/helpers";
-
-interface ParagraphTestimonialProps {
-  paragraph: FragmentOf<typeof ParagraphTestimonialFragment>;
-}
 
 const ParagraphAuthorFragment = graphql(
   `
@@ -39,37 +35,33 @@ export const ParagraphTestimonialFragment = graphql(
   [ParagraphAuthorFragment],
 );
 
-export const ParagraphTestimonialResolver = ({
+type AuthorField = Extract<
+  NonNullable<ResultOf<typeof ParagraphTestimonialFragment>["author"]>,
+  { __typename: "ParagraphAuthor" }
+>;
+
+export const paragraphTestimonialResolver = ({
   paragraph,
-}: ParagraphTestimonialProps) => {
+}: {
+  paragraph: ResultOf<typeof ParagraphTestimonialFragment>;
+}) => {
   const {
     id,
     quote,
     author: authorFragment,
-  } = readFragment(ParagraphTestimonialFragment, paragraph);
-  const {
-    name,
-    position,
-    company,
-    image: imageFragment,
-  } = readFragment(
+  } = paragraph;
+  const { name, position, company, image: imageFragment } = readFragment(
     ParagraphAuthorFragment,
-    authorFragment as FragmentOf<typeof ParagraphAuthorFragment>,
+    authorFragment as AuthorField,
   );
-  const image = resolveMediaImage(imageFragment);
-
-  return (
-    <Testimonial
-      id={id}
-      key={id}
-      quote={quote}
-      author={{
-        name,
-        position,
-        company,
-        // @ts-expect-error - fix typings.
-        avatar: image,
-      }}
-    />
-  );
+  return {
+    id,
+    quote,
+    author: {
+      name,
+      position,
+      company,
+      avatar: { src: resolveMediaImage(imageFragment)?.src, name },
+    },
+  };
 };

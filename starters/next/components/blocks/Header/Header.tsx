@@ -1,5 +1,4 @@
 "use client";
-
 import { cva, type VariantProps } from "class-variance-authority";
 import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
 import { type ComponentPropsWithoutRef, useState } from "react";

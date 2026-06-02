@@ -1,12 +1,8 @@
-import { type FragmentOf, readFragment } from "gql.tada";
-import { CardGroup } from "@/components/blocks";
+import type { ResultOf } from "gql.tada";
+import { readFragment } from "gql.tada";
 import { MediaImageFragment } from "@/graphql/fragments/media";
 import { graphql } from "@/graphql/gql.tada";
 import { resolveMediaImage } from "@/integration/resolvers/helpers";
-
-interface ParagraphCardGroupProps {
-  paragraph: FragmentOf<typeof ParagraphCardGroupFragment>;
-}
 
 const ParagraphSimpleCardFragment = graphql(
   `
@@ -40,18 +36,24 @@ export const ParagraphCardGroupFragment = graphql(
   [ParagraphSimpleCardFragment],
 );
 
-export const ParagraphCardGroupResolver = ({
+type CardItem = Extract<
+  NonNullable<ResultOf<typeof ParagraphCardGroupFragment>["items"]>[number],
+  { __typename: "ParagraphSimpleCard" }
+>;
+
+export const paragraphCardGroupResolver = ({
   paragraph,
-}: ParagraphCardGroupProps) => {
-  const { id, heading, subheadingOptional, items, descriptionOptional } =
-    readFragment(ParagraphCardGroupFragment, paragraph);
+}: {
+  paragraph: ResultOf<typeof ParagraphCardGroupFragment>;
+}) => {
+  const { id, heading, subheadingOptional, items, descriptionOptional } = paragraph;
 
   const cards = items
     ? items.map((item) => {
-        const type = "simple";
+        const type = "simple" as const;
         const { heading, description, image } = readFragment(
           ParagraphSimpleCardFragment,
-          item as FragmentOf<typeof ParagraphSimpleCardFragment>,
+          item as CardItem,
         );
 
         return {
@@ -63,14 +65,11 @@ export const ParagraphCardGroupResolver = ({
       })
     : [];
 
-  return (
-    <CardGroup
-      id={id}
-      key={id}
-      heading={heading}
-      subheading={subheadingOptional || ""}
-      description={descriptionOptional || ""}
-      cards={cards}
-    />
-  );
+  return {
+    id,
+    heading,
+    subheading: subheadingOptional || "",
+    description: descriptionOptional || "",
+    cards,
+  };
 };

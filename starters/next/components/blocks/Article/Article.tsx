@@ -2,11 +2,11 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentPropsWithoutRef } from "react";
 import {
   Avatar,
-  type AvatarProps,
   Badge,
   type ImageProps,
   RichText,
 } from "@/components/primitives";
+import type { UserProps } from "@/integration/resolvers/helpers";
 import { cn } from "@/lib/utils";
 
 const articleVariants = cva("w-full mb-12 md:mb-16", {
@@ -14,10 +14,7 @@ const articleVariants = cva("w-full mb-12 md:mb-16", {
   defaultVariants: {},
 });
 
-type AuthorProps = {
-  avatar: AvatarProps;
-  name: string;
-};
+type AuthorProps = UserProps;
 
 export interface ArticleProps
   extends ComponentPropsWithoutRef<"article">,
