@@ -1,8 +1,5 @@
-import type { ReactNode } from "react";
 import { readFragment } from "gql.tada";
 import type { Spec } from "@json-render/core";
-
-import { JSONUIProvider, Renderer } from "@json-render/react";
 import { ParagraphUnionFragment } from "~/graphql/fragments/paragraph";
 import type { NodeResultOf, ParagraphResultOf } from "~/graphql/types";
 import { nodeArticleResolver } from "~/integration/resolvers/NodeArticleResolver";
@@ -38,8 +35,6 @@ import {
   ParagraphWebformFragment,
   paragraphWebformResolver,
 } from "~/integration/resolvers/ParagraphWebformResolver";
-import { registry } from "~/integration/resolvers/registry";
-
 const resolverMap: Record<
   string,
   (item: ParagraphResultOf) => Record<string, unknown>
@@ -177,16 +172,4 @@ export function resolve({ header, footer, entity }: ResolveProps): Spec {
   // console.log( JSON.stringify(spec, null, 2) )
 
   return spec;
-}
-
-interface SpecRendererProps {
-  spec: Spec;
-}
-
-export function SpecRenderer({ spec }: SpecRendererProps): ReactNode {
-  return (
-    <JSONUIProvider registry={registry}>
-      <Renderer spec={spec} registry={registry} />
-    </JSONUIProvider>
-  );
 }

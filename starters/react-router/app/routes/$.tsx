@@ -13,7 +13,8 @@ import type { NodeResultOf } from "~/graphql/types";
 import { graphql } from "~/graphql/gql.tada";
 import { calculateMetaTags } from "~/utils/metatags";
 import { calculatePath } from "~/utils/routes";
-import { resolve, SpecRenderer } from "~/integration/resolvers/resolver";
+import { resolve } from "~/integration/resolvers/resolver";
+import { SpecRenderer } from "~/integration/resolvers/SpecRenderer";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData) {
