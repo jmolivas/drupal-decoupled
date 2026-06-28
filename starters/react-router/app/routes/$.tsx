@@ -14,7 +14,10 @@ import { graphql } from "~/graphql/gql.tada";
 import { calculateMetaTags } from "~/utils/metatags";
 import { calculatePath } from "~/utils/routes";
 import { resolve } from "~/integration/resolvers/resolver";
-import { SpecRenderer } from "~/integration/resolvers/SpecRenderer";
+import NodePage from "~/integration/layout/NodePage";
+import NodeArticle from "~/integration/layout/NodeArticle";
+import { Footer, Header } from "~/components/blocks";
+import type { Spec } from "@json-render/core";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData) {
@@ -107,21 +110,21 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     if (entity.__typename === "NodePage") {
       return readFragment(
         NodePageFragment,
-        entity as unknown as FragmentOf<typeof NodePageFragment>,
+        entity as FragmentOf<typeof NodePageFragment>,
       );
     }
 
     if (entity.__typename === "NodeArticle") {
       return readFragment(
         NodeArticleFragment,
-        entity as unknown as FragmentOf<typeof NodeArticleFragment>,
+        entity as FragmentOf<typeof NodeArticleFragment>,
       );
     }
 
     throw new Error(`Unsupported entity type: ${entity.__typename}`);
   };
 
-  const entity = resolveEntity({ entity: data.route.entity });
+  const node = resolveEntity({ entity: data.route.entity });
 
   const menuMain = readFragment(MenuFragment, data.menuMain);
   const navItems = menuMain?.items
@@ -155,7 +158,17 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const logo = { src: logoUrl, alt: "Company Logo" };
 
-  const spec = resolve({
+  const resolveSpec = (entity: NodeResultOf): Spec | null => {
+    if (entity.__typename === "NodePage") {
+      return resolve({ node: entity });
+    }
+
+    return null;
+  };
+
+  return {
+    node,
+    spec: resolveSpec(node),
     header: {
       logo,
       navItems,
@@ -176,16 +189,34 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       copyrightText: `© ${new Date().getFullYear()} Drupal Decoupled`,
       columns: footerColumns,
     },
-    entity,
-  });
-
-  return {
-    spec,
-    tags: calculateMetaTags(entity),
+    tags: calculateMetaTags(node),
     drupalUrl,
   };
 }
 
-export default function Page({ loaderData: { spec } }: Route.ComponentProps) {
-  return <SpecRenderer spec={spec} />;
+export default function Page({
+  loaderData: { node, header, footer, spec },
+}: Route.ComponentProps) {
+  return (
+    <>
+      <Header
+        logo={header.logo}
+        navItems={header.navItems}
+        sticky={header.sticky}
+        actions={header.actions}
+      />
+
+      {node.__typename === "NodePage" && spec && (
+        <NodePage node={node} spec={spec} />
+      )}
+
+      {node.__typename === "NodeArticle" && <NodeArticle node={node} />}
+
+      <Footer
+        logo={footer.logo}
+        copyrightText={footer.copyrightText}
+        columns={footer.columns}
+      />
+    </>
+  );
 }

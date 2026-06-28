@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
 import type { Spec } from "@json-render/core";
 import { JSONUIProvider, Renderer } from "@json-render/react";
+import type { ReactNode } from "react";
+
 import { registry } from "~/integration/resolvers/registry";
 
 interface SpecRendererProps {

@@ -5,15 +5,18 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
+import { Footer, Header } from "@/components/blocks";
 import { MenuFragment, MenuItemFragment } from "@/graphql/fragments/menu";
 import {
   NodeArticleFragment,
   NodePageFragment,
 } from "@/graphql/fragments/node";
 import { graphql } from "@/graphql/gql.tada";
+import type { Spec } from "@json-render/core";
 import type { NodeResultOf } from "@/graphql/types";
+import NodeArticle from "@/integration/layout/NodeArticle";
+import NodePage from "@/integration/layout/NodePage";
 import { resolve } from "@/integration/resolvers/resolver";
-import { SpecRenderer } from "@/integration/resolvers/SpecRenderer";
 import { getClient } from "@/utils/client";
 import { calculateMetaTags } from "@/utils/metatags";
 import { calculatePath } from "@/utils/routes";
@@ -101,7 +104,7 @@ const getDrupalData = cache(
       throw new Error(`Unsupported entity type: ${entity.__typename}`);
     };
 
-    const entity = resolveEntity({ entity: data.route.entity });
+    const node = resolveEntity({ entity: data.route.entity });
 
     const menuMain = readFragment(MenuFragment, data.menuMain);
     const navItems = menuMain?.items
@@ -134,7 +137,16 @@ const getDrupalData = cache(
 
     const logo = { src: logoUrl, alt: "Company Logo" };
 
-    const spec = resolve({
+    const resolveSpec = (entity: NodeResultOf): Spec | null => {
+      if (entity.__typename === "NodePage") {
+        return resolve({ node: entity });
+      }
+      return null;
+    };
+
+    return {
+      node,
+      spec: resolveSpec(node),
       header: {
         logo,
         navItems,
@@ -155,12 +167,7 @@ const getDrupalData = cache(
         copyrightText: `© ${new Date().getFullYear()} Drupal Decoupled`,
         columns: footerColumns,
       },
-      entity,
-    });
-
-    return {
-      spec,
-      tags: calculateMetaTags(entity),
+      tags: calculateMetaTags(node),
       drupalUrl,
     };
   },
@@ -200,6 +207,27 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: PageProps) {
-  const { spec } = await getDrupalData({ params: await params });
-  return <SpecRenderer spec={spec} />;
+  const { node, spec, header, footer } = await getDrupalData({
+    params: await params,
+  });
+
+  return (
+    <>
+      <Header
+        logo={header.logo}
+        navItems={header.navItems}
+        sticky={header.sticky}
+        actions={header.actions}
+      />
+      {node.__typename === "NodePage" && spec && (
+        <NodePage node={node} spec={spec} />
+      )}
+      {node.__typename === "NodeArticle" && <NodeArticle node={node} />}
+      <Footer
+        logo={footer.logo}
+        copyrightText={footer.copyrightText}
+        columns={footer.columns}
+      />
+    </>
+  );
 }

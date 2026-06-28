@@ -1,7 +1,12 @@
 import { CardGroup, Hero } from "@/components/blocks";
 import type { CardGroupProps } from "@/components/blocks/CardGroup/CardGroup";
 import type { ImageProps } from "@/components/primitives";
-import type { ViewReferenceData } from "@/integration/resolvers/ParagraphViewReferenceResolver";
+
+type ViewReferenceAction = {
+  href: string;
+  text: string;
+  internal?: boolean;
+};
 
 type ViewReferenceCard = {
   heading: string;
@@ -19,7 +24,7 @@ export interface ViewReferenceProps {
   headingOptional?: string | null;
   subheadingOptional?: string | null;
   descriptionOptional?: string | null;
-  action?: ViewReferenceData["action"];
+  action?: ViewReferenceAction;
 }
 
 export const ViewReference = ({

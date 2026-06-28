@@ -24,28 +24,6 @@ const linkSchema = z.object({
   internal: z.boolean().optional(),
 });
 
-interface NavItem {
-  label: string;
-  href?: string;
-  expanded?: boolean;
-  children?: NavItem[];
-}
-
-const navItemSchema: z.ZodType<NavItem> = z.lazy(() =>
-  z.object({
-    label: z.string(),
-    href: z.string().optional(),
-    expanded: z.boolean().optional(),
-    children: z.array(navItemSchema).optional(),
-  }),
-);
-
-const footerLinkSchema = z.object({
-  href: z.string(),
-  children: z.string(),
-  internal: z.boolean().optional(),
-});
-
 const simpleCardSchema = z.object({
   type: z.literal("simple"),
   heading: z.string(),
@@ -94,62 +72,7 @@ export const catalog = defineCatalog(schema, {
       description: "Root article wrapper that renders the article content as children",
     },
 
-    // Nodes
-    Article: {
-      props: z.object({
-        title: z.string(),
-        summary: z.string().optional(),
-        content: z.string(),
-        image: imageSchema,
-        tags: z.array(z.string()).optional(),
-        publishDate: z.number(),
-        author: z.object({
-          avatar: z.object({
-            src: z.string().optional(),
-            name: z.string(),
-          }),
-          name: z.string(),
-        }),
-      }),
-      slots: [],
-      description: "Full article layout with hero image, title, author, tags, and rich-text content.",
-    },
-
-    // Layout
-    Header: {
-      props: z.object({
-        logo: imageSchema,
-        navItems: z.array(navItemSchema),
-        actions: z.array(buttonSchema),
-        sticky: z.boolean().optional(),
-      }),
-      slots: [],
-      description: "Site header with logo, navigation menu, and action buttons.",
-    },
-    Footer: {
-      props: z.object({
-        logo: imageSchema,
-        copyrightText: z.string(),
-        columns: z.array(
-          z.object({
-            title: z.string(),
-            links: z.array(footerLinkSchema),
-          }),
-        ),
-      }),
-      slots: [],
-      description: "Site footer with logo, copyright text, and navigation columns.",
-    },
-
     // Components
-    Heading: {
-      props: z.object({
-        title: z.string(),
-      }),
-      slots: [],
-      description: "Page title heading rendered as an h1 element.",
-    },
-
     ParagraphHero: {
       props: z.object({
         heading: z.string(),

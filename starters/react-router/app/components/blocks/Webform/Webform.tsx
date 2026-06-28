@@ -1,5 +1,4 @@
 import type { FC } from "react";
-import { ContactForm } from "~/integration/forms/ContactForm/ContactForm";
 
 type FormComponent = FC<{ id: string }>;
 
@@ -10,9 +9,7 @@ export interface WebformProps {
   description?: string | null;
 }
 
-export const webformComponents: Record<string, FormComponent> = {
-  contact_form: ContactForm,
-};
+export const webformComponents: Record<string, FormComponent> = {};
 
 export const Webform = ({
   formId,

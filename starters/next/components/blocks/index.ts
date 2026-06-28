@@ -4,7 +4,6 @@ export * from "@/components/blocks/CTA/CTA";
 export * from "@/components/blocks/FAQ/FAQ";
 export * from "@/components/blocks/Footer/Footer";
 export * from "@/components/blocks/Header/Header";
-export * from "@/components/blocks/Heading/Heading";
 export * from "@/components/blocks/Hero/Hero";
 export * from "@/components/blocks/LogoGroup/LogoGroup";
 export * from "@/components/blocks/Testimonial/Testimonial";

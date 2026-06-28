@@ -1,8 +1,7 @@
 import { readFragment } from "gql.tada";
 import type { Spec } from "@json-render/core";
 import { ParagraphUnionFragment } from "@/graphql/fragments/paragraph";
-import type { NodeResultOf, ParagraphResultOf } from "@/graphql/types";
-import { nodeArticleResolver } from "@/integration/resolvers/NodeArticleResolver";
+import type { NodePageResultOf, ParagraphResultOf } from "@/graphql/types";
 import {
   ParagraphCardGroupFragment,
   paragraphCardGroupResolver,
@@ -35,6 +34,7 @@ import {
   ParagraphWebformFragment,
   paragraphWebformResolver,
 } from "@/integration/resolvers/ParagraphWebformResolver";
+
 const resolverMap: Record<
   string,
   (item: ParagraphResultOf) => Record<string, unknown>
@@ -98,13 +98,11 @@ const resolverMap: Record<
 };
 
 interface ResolveProps {
-  header: Record<string, unknown>;
-  footer: Record<string, unknown>;
-  entity: NodeResultOf;
+  node: NodePageResultOf;
 }
 
-export function resolve({ header, footer, entity }: ResolveProps): Spec {
-  const typename = entity.__typename;
+export function resolve({ node }: ResolveProps): Spec {
+  const typename = node.__typename;
   const rootChildren: string[] = [];
   const spec: Spec = {
     root: typename,
@@ -119,35 +117,8 @@ export function resolve({ header, footer, entity }: ResolveProps): Spec {
     },
   };
 
-  if (header) {
-    const headerId = `${entity.id}-Header`;
-    rootChildren.push(headerId);
-    spec.elements[headerId] = {
-      type: "Header",
-      props: header,
-    };
-  }
-
-  if (entity.__typename === "NodeArticle") {
-    const props = nodeArticleResolver({ node: entity });
-    const articleId = `${entity.id}-Article`;
-    rootChildren.push(articleId);
-    spec.elements[articleId] = {
-      type: "Article",
-      props,
-    };
-  }
-
-  if (entity.__typename === "NodePage") {
-    if (entity.showTitle) {
-      const headingId = `${entity.id}-Heading`;
-      rootChildren.push(headingId);
-      spec.elements[headingId] = {
-        type: "Heading",
-        props: { title: entity.title },
-      };
-    }
-    for (const component of entity.components ?? []) {
+  if (typename === "NodePage") {
+    for (const component of node.components ?? []) {
       const item = readFragment(ParagraphUnionFragment, component);
       rootChildren.push(item.id);
       const resolver = resolverMap[item.__typename];
@@ -159,17 +130,6 @@ export function resolve({ header, footer, entity }: ResolveProps): Spec {
       }
     }
   }
-
-  if (footer) {
-    const footerId = `${entity.id}-Footer`;
-    rootChildren.push(footerId);
-    spec.elements[footerId] = {
-      type: "Footer",
-      props: footer,
-    };
-  }
-
-  // console.log( JSON.stringify(spec, null, 2) )
 
   return spec;
 }

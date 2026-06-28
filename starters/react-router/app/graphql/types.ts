@@ -5,8 +5,12 @@ import type {
 } from "~/graphql/fragments/node";
 import type { ParagraphUnionFragment } from "~/graphql/fragments/paragraph";
 
+export type NodePageResultOf = ResultOf<typeof NodePageFragment>;
+
+export type NodeArticleResultOf = ResultOf<typeof NodeArticleFragment>;
+
 export type NodeResultOf =
-  | ResultOf<typeof NodePageFragment>
-  | ResultOf<typeof NodeArticleFragment>;
+  | NodePageResultOf
+  | NodeArticleResultOf;
 
 export type ParagraphResultOf = ResultOf<typeof ParagraphUnionFragment>;
